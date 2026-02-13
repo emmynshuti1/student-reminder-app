@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Reminder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Add New Reminder</h2>
+        <form id="reminderForm">
+            <input type="text" id="title" placeholder="Title (e.g. Math Homework)" required>
+            <input type="text" id="subject" placeholder="Subject" required>
+            <textarea id="description" placeholder="Description (optional)"></textarea>
+            <label>Due Date:</label>
+            <input type="date" id="due_date" required>
+            <label>Due Time:</label>
+            <input type="time" id="due_time" required>
+            <label>Priority:</label>
+            <select id="priority">
+                <option value="High">High</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="Low">Low</option>
+            </select>
+            <button type="submit">Save Reminder</button>
+            <a href="dashboard.html" class="cancel">Cancel</a>
+        </form>
+    </div>
+    <script>
+        document.getElementById('reminderForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const reminder = {
+                title: document.getElementById('title').value,
+                subject: document.getElementById('subject').value,
+                description: document.getElementById('description').value,
+                due_date: document.getElementById('due_date').value,
+                due_time: document.getElementById('due_time').value,
+                priority: document.getElementById('priority').value
+            };
+            const res = await fetch('/api/reminders', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(reminder)
+            });
+            const data = await res.json();
+            if (data.id) {
+                alert('Reminder added!');
+                window.location.href = 'dashboard.html';
+            } else {
+                alert('Error: ' + data.error);
+            }
+        };
+    </script>
+</body>
+</html>
