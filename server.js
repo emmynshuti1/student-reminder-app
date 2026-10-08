@@ -1,9 +1,21 @@
 const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
-const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 const crypto = require('crypto');
+
+// The built-in SQLite module needs Node.js 22.5+. Fail with a clear message
+// instead of a raw stack trace when the app is started on an older Node.
+let DatabaseSync;
+try {
+  ({ DatabaseSync } = require('node:sqlite'));
+} catch (err) {
+  console.error('');
+  console.error('CampusPulse requires Node.js 22.5 or newer (it uses the built-in SQLite module).');
+  console.error('Please upgrade Node.js (https://nodejs.org) and run "npm start" again.');
+  console.error('');
+  process.exit(1);
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -73,6 +85,11 @@ app.use((req, res, next) => {
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+// secure: 'auto' marks the cookie Secure only when the request is HTTPS
+// (honouring X-Forwarded-Proto behind a proxy) and leaves it a plain cookie
+// over plain HTTP. With a hard-coded secure: true, express-session never sends
+// the cookie at all on non-HTTPS requests, which silently breaks login on
+// http://localhost:3000 and behind proxies that do not forward the proto.
 app.use(session({
   secret: process.env.SESSION_SECRET || 'student-reminder-secret-key',
   resave: false,
@@ -80,8 +97,8 @@ app.use(session({
   proxy: true,
   cookie: {
     httpOnly: true,
-    sameSite: 'none',
-    secure: true,
+    sameSite: 'lax',
+    secure: 'auto',
     maxAge: 7 * 24 * 60 * 60 * 1000
   }
 }));
@@ -145,7 +162,11 @@ app.post('/api/register', (req, res) => {
     const token = issueToken(user.id);
     res.json(loginPayload(user, token));
   } catch (err) {
-    res.status(400).json({ error: 'Email already exists' });
+    if (err && /UNIQUE/i.test(String(err.message))) {
+      return res.status(400).json({ error: 'Email already exists' });
+    }
+    console.error('Registration error:', err);
+    res.status(500).json({ error: 'Registration failed. Please try again.' });
   }
 });
 
@@ -247,6 +268,13 @@ app.use((req, res, next) => {
   });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
+});
+server.on('error', (err) => {
+  if (err && err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Stop the process using it, or start with: PORT=<other-port> npm start`);
+    process.exit(1);
+  }
+  throw err;
 });

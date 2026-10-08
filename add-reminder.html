@@ -39,14 +39,25 @@
     const editId = params.get('id');
 
     async function ensureAuth() {
-      const res = await fetch('/api/user', { credentials: 'same-origin' });
+      let res;
+      try {
+        res = await fetch('/api/user', { credentials: 'same-origin' });
+      } catch (networkErr) {
+        document.getElementById('error').textContent = 'Could not reach the CampusPulse server. Run "npm start" and open http://localhost:3000';
+        return;
+      }
       if (!res.ok) location.href = 'index.html';
     }
 
     async function loadEdit() {
       if (!editId) return;
       document.getElementById('formTitle').textContent = 'Edit reminder';
-      const res = await fetch('/api/reminders/' + editId, { credentials: 'same-origin' });
+      let res;
+      try {
+        res = await fetch('/api/reminders/' + editId, { credentials: 'same-origin' });
+      } catch (networkErr) {
+        return;
+      }
       if (!res.ok) return;
       const r = await res.json();
       document.getElementById('title').value = r.title || '';
@@ -71,13 +82,19 @@
       };
       const url = editId ? '/api/reminders/' + editId : '/api/reminders';
       const method = editId ? 'PUT' : 'POST';
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify(reminder)
-      });
-      const data = await res.json();
+      let data;
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(reminder)
+        });
+        data = await res.json();
+      } catch (networkErr) {
+        document.getElementById('error').textContent = 'Could not reach the CampusPulse server. Run "npm start" and open http://localhost:3000';
+        return;
+      }
       if (data.id || data.success) {
         window.location.href = 'dashboard.html';
       } else {

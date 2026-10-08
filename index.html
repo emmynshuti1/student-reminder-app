@@ -30,20 +30,26 @@
     </div>
   </div>
   <script>
-    fetch('/api/user').then(r => { if (r.ok) location.href = 'dashboard.html'; });
+    fetch('/api/user').then(r => { if (r.ok) location.href = 'dashboard.html'; }).catch(() => {});
     document.getElementById('loginForm').onsubmit = async function(e) {
       e.preventDefault();
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       const error = document.getElementById('error');
       error.textContent = '';
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
+      let data;
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ email, password })
+        });
+        data = await res.json();
+      } catch (networkErr) {
+        error.textContent = 'Could not reach the CampusPulse server. Run "npm start" and open http://localhost:3000';
+        return;
+      }
       if (data.success) {
         window.location.href = 'dashboard.html';
       } else {

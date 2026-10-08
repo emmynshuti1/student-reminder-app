@@ -30,7 +30,13 @@ function toast(msg) {
 let allReminders = [];
 
 window.onload = async function() {
-  const userRes = await fetch('/api/user', { credentials: 'same-origin' });
+  let userRes;
+  try {
+    userRes = await fetch('/api/user', { credentials: 'same-origin' });
+  } catch (networkErr) {
+    window.location.href = 'index.html';
+    return;
+  }
   if (!userRes.ok) {
     window.location.href = 'index.html';
     return;
@@ -63,7 +69,12 @@ window.onload = async function() {
 };
 
 async function loadReminders() {
-  const res = await fetch('/api/reminders', { credentials: 'same-origin' });
+  let res;
+  try {
+    res = await fetch('/api/reminders', { credentials: 'same-origin' });
+  } catch (networkErr) {
+    return;
+  }
   if (!res.ok) return;
   allReminders = await res.json();
   renderReminders();
@@ -161,7 +172,12 @@ function renderReminders() {
 const notified = new Set();
 
 async function checkDueReminders() {
-  const res = await fetch('/api/reminders', { credentials: 'same-origin' });
+  let res;
+  try {
+    res = await fetch('/api/reminders', { credentials: 'same-origin' });
+  } catch (networkErr) {
+    return;
+  }
   if (!res.ok) return;
   const reminders = await res.json();
   const now = new Date();
