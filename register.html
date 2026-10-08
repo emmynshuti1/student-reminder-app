@@ -36,13 +36,19 @@
       const password = document.getElementById('password').value;
       const error = document.getElementById('error');
       error.textContent = '';
-      const res = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify({ name, email, password })
-      });
-      const data = await res.json();
+      let data;
+      try {
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ name, email, password })
+        });
+        data = await res.json();
+      } catch (networkErr) {
+        error.textContent = 'Could not reach the CampusPulse server. Run "npm start" and open http://localhost:3000';
+        return;
+      }
       if (data.success) {
         window.location.href = 'dashboard.html';
       } else {

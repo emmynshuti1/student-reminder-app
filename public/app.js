@@ -12,7 +12,12 @@ function setToken(t) {
 async function api(path, options = {}) {
   const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
   if (token()) headers.Authorization = 'Bearer ' + token();
-  const res = await fetch(path, Object.assign({}, options, { headers, credentials: 'include' }));
+  let res;
+  try {
+    res = await fetch(path, Object.assign({}, options, { headers, credentials: 'include' }));
+  } catch (networkErr) {
+    throw new Error('Could not reach the CampusPulse server. Make sure it is running (npm start), then reload this page.');
+  }
   let data = {};
   try { data = await res.json(); } catch (_) {}
   if (!res.ok) {
