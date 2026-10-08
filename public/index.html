@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusPulse</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <section id="page-login" class="page">
+    <div class="auth-wrap">
+      <div class="card">
+        <div class="brand"><div class="logo">CP</div><div><h2>CampusPulse</h2><p class="muted" style="margin:0">Never miss a deadline</p></div></div>
+        <h1>Welcome back</h1>
+        <p class="muted">Sign in to your study reminders.</p>
+        <form id="loginForm">
+          <label>Email</label>
+          <input type="email" id="loginEmail" required placeholder="you@school.edu">
+          <label>Password</label>
+          <input type="password" id="loginPassword" required>
+          <p class="error" id="loginError"></p>
+          <button type="submit">Login</button>
+        </form>
+        <p class="muted">No account? <a href="#register">Register</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="page-register" class="page">
+    <div class="auth-wrap">
+      <div class="card">
+        <div class="brand"><div class="logo">CP</div><h2>CampusPulse</h2></div>
+        <h1>Create account</h1>
+        <p class="muted">Track homework, exams, and study sessions.</p>
+        <form id="registerForm">
+          <label>Full name</label>
+          <input type="text" id="regName" required>
+          <label>Email</label>
+          <input type="email" id="regEmail" required>
+          <label>Password (min 6)</label>
+          <input type="password" id="regPassword" minlength="6" required>
+          <p class="error" id="regError"></p>
+          <button type="submit">Register</button>
+        </form>
+        <p class="muted">Have an account? <a href="#login">Login</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="page-dash" class="page">
+    <div class="dash">
+      <div class="header">
+        <div>
+          <h1>Hey, <span id="userName">student</span></h1>
+          <p class="muted" id="todayLabel"></p>
+        </div>
+        <div class="actions">
+          <button class="inline" id="addBtn" type="button">+ Add reminder</button>
+          <button class="inline secondary" id="logoutBtn" type="button">Logout</button>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><strong id="statPending">0</strong><span>Pending</span></div>
+        <div class="stat"><strong id="statOverdue">0</strong><span>Overdue</span></div>
+        <div class="stat"><strong id="statToday">0</strong><span>Due today</span></div>
+        <div class="stat"><strong id="statDone">0</strong><span>Completed</span></div>
+      </div>
+      <div class="toolbar">
+        <input type="search" id="search" placeholder="Search title or subject…">
+        <select id="filterStatus">
+          <option value="all">All statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Completed">Completed</option>
+          <option value="Overdue">Overdue</option>
+        </select>
+        <select id="filterPriority">
+          <option value="all">All priorities</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+      <div id="reminderList"></div>
+    </div>
+  </section>
+
+  <section id="page-form" class="page">
+    <div class="auth-wrap">
+      <div class="card">
+        <h2 id="formTitle">Add reminder</h2>
+        <p class="muted">Homework, exams, or study blocks.</p>
+        <form id="reminderForm">
+          <input type="hidden" id="editId">
+          <label>Title</label>
+          <input type="text" id="title" required>
+          <label>Subject</label>
+          <input type="text" id="subject" required>
+          <label>Notes</label>
+          <textarea id="description"></textarea>
+          <label>Due date</label>
+          <input type="date" id="due_date" required>
+          <label>Due time</label>
+          <input type="time" id="due_time" required>
+          <label>Priority</label>
+          <select id="priority">
+            <option>High</option>
+            <option selected>Medium</option>
+            <option>Low</option>
+          </select>
+          <p class="error" id="formError"></p>
+          <button type="submit">Save reminder</button>
+          <button type="button" class="secondary" id="cancelForm">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

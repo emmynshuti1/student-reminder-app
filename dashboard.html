@@ -1,23 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Dashboard - Student Reminder</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard · CampusPulse</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="dashboard">
-        <div class="header">
-            <h1>Welcome, <span id="userName"></span></h1>
-            <button id="logoutBtn">Logout</button>
-        </div>
-        <div class="actions">
-            <a href="add-reminder.html" class="btn">+ Add Reminder</a>
-        </div>
-        <div class="reminders">
-            <h2>Upcoming Reminders</h2>
-            <div id="reminderList"></div>
-        </div>
+  <div class="dashboard">
+    <div class="header">
+      <div>
+        <h1>Hey, <span id="userName"></span></h1>
+        <p class="subtitle" id="todayLabel"></p>
+      </div>
+      <button id="logoutBtn" type="button">Logout</button>
     </div>
-    <script src="script.js"></script>
+    <div class="stats">
+      <div class="stat"><strong id="statPending">0</strong><span>Pending</span></div>
+      <div class="stat"><strong id="statOverdue">0</strong><span>Overdue</span></div>
+      <div class="stat"><strong id="statToday">0</strong><span>Due today</span></div>
+      <div class="stat"><strong id="statDone">0</strong><span>Completed</span></div>
+    </div>
+    <div class="actions">
+      <a href="add-reminder.html" class="btn">+ Add reminder</a>
+    </div>
+    <div class="toolbar">
+      <input type="search" id="search" placeholder="Search title or subject…">
+      <select id="filterStatus">
+        <option value="all">All statuses</option>
+        <option value="Pending">Pending</option>
+        <option value="Completed">Completed</option>
+        <option value="Overdue">Overdue</option>
+      </select>
+      <select id="filterPriority">
+        <option value="all">All priorities</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+    </div>
+    <div class="reminders">
+      <h2>Your reminders</h2>
+      <div id="reminderList"></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
 </body>
 </html>

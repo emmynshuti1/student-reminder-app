@@ -1,54 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Add Reminder</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Reminder · CampusPulse</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="auth-wrap">
     <div class="container">
-        <h2>Add New Reminder</h2>
-        <form id="reminderForm">
-            <input type="text" id="title" placeholder="Title (e.g. Math Homework)" required>
-            <input type="text" id="subject" placeholder="Subject" required>
-            <textarea id="description" placeholder="Description (optional)"></textarea>
-            <label>Due Date:</label>
-            <input type="date" id="due_date" required>
-            <label>Due Time:</label>
-            <input type="time" id="due_time" required>
-            <label>Priority:</label>
-            <select id="priority">
-                <option value="High">High</option>
-                <option value="Medium" selected>Medium</option>
-                <option value="Low">Low</option>
-            </select>
-            <button type="submit">Save Reminder</button>
-            <a href="dashboard.html" class="cancel">Cancel</a>
-        </form>
+      <h2 id="formTitle">Add reminder</h2>
+      <p class="subtitle">Homework, exams, or study blocks.</p>
+      <form id="reminderForm">
+        <label for="title">Title</label>
+        <input type="text" id="title" placeholder="Math homework" required>
+        <label for="subject">Subject</label>
+        <input type="text" id="subject" placeholder="Calculus" required>
+        <label for="description">Notes</label>
+        <textarea id="description" placeholder="Optional details"></textarea>
+        <label for="due_date">Due date</label>
+        <input type="date" id="due_date" required>
+        <label for="due_time">Due time</label>
+        <input type="time" id="due_time" required>
+        <label for="priority">Priority</label>
+        <select id="priority">
+          <option value="High">High</option>
+          <option value="Medium" selected>Medium</option>
+          <option value="Low">Low</option>
+        </select>
+        <p class="error-msg" id="error"></p>
+        <button type="submit">Save reminder</button>
+        <a href="dashboard.html" class="cancel">Cancel</a>
+      </form>
     </div>
-    <script>
-        document.getElementById('reminderForm').onsubmit = async function(e) {
-            e.preventDefault();
-            const reminder = {
-                title: document.getElementById('title').value,
-                subject: document.getElementById('subject').value,
-                description: document.getElementById('description').value,
-                due_date: document.getElementById('due_date').value,
-                due_time: document.getElementById('due_time').value,
-                priority: document.getElementById('priority').value
-            };
-            const res = await fetch('/api/reminders', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(reminder)
-            });
-            const data = await res.json();
-            if (data.id) {
-                alert('Reminder added!');
-                window.location.href = 'dashboard.html';
-            } else {
-                alert('Error: ' + data.error);
-            }
-        };
-    </script>
+  </div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const editId = params.get('id');
+
+    async function ensureAuth() {
+      const res = await fetch('/api/user', { credentials: 'same-origin' });
+      if (!res.ok) location.href = 'index.html';
+    }
+
+    async function loadEdit() {
+      if (!editId) return;
+      document.getElementById('formTitle').textContent = 'Edit reminder';
+      const res = await fetch('/api/reminders/' + editId, { credentials: 'same-origin' });
+      if (!res.ok) return;
+      const r = await res.json();
+      document.getElementById('title').value = r.title || '';
+      document.getElementById('subject').value = r.subject || '';
+      document.getElementById('description').value = r.description || '';
+      document.getElementById('due_date').value = r.due_date || '';
+      document.getElementById('due_time').value = r.due_time || '';
+      document.getElementById('priority').value = r.priority || 'Medium';
+    }
+
+    ensureAuth().then(loadEdit);
+
+    document.getElementById('reminderForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const reminder = {
+        title: document.getElementById('title').value,
+        subject: document.getElementById('subject').value,
+        description: document.getElementById('description').value,
+        due_date: document.getElementById('due_date').value,
+        due_time: document.getElementById('due_time').value,
+        priority: document.getElementById('priority').value
+      };
+      const url = editId ? '/api/reminders/' + editId : '/api/reminders';
+      const method = editId ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(reminder)
+      });
+      const data = await res.json();
+      if (data.id || data.success) {
+        window.location.href = 'dashboard.html';
+      } else {
+        document.getElementById('error').textContent = data.error || 'Could not save';
+      }
+    };
+  </script>
 </body>
 </html>
