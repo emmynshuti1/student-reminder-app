@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login · CampusPulse</title>
+  <title>Register · CampusPulse</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,43 +11,42 @@
     <div class="container">
       <div class="brand">
         <div class="logo">CP</div>
-        <div>
-          <h2>CampusPulse</h2>
-          <p class="subtitle" style="margin:0">Never miss a deadline again</p>
-        </div>
+        <h2>CampusPulse</h2>
       </div>
-      <h1 style="margin-top:24px">Welcome back</h1>
-      <p class="subtitle">Sign in to your study reminders.</p>
-      <form id="loginForm">
+      <h1 style="margin-top:20px">Create account</h1>
+      <p class="subtitle">Track homework, exams, and study sessions.</p>
+      <form id="registerForm">
+        <label for="name">Full name</label>
+        <input type="text" id="name" placeholder="Alex Rivera" required>
         <label for="email">Email</label>
         <input type="email" id="email" placeholder="you@school.edu" required>
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="Password" required>
+        <label for="password">Password (min 6 characters)</label>
+        <input type="password" id="password" placeholder="Password" minlength="6" required>
         <p class="error-msg" id="error"></p>
-        <button type="submit">Login</button>
-        <p>Don't have an account? <a href="register.html">Register</a></p>
+        <button type="submit">Register</button>
+        <p>Already have an account? <a href="index.html">Login</a></p>
       </form>
     </div>
   </div>
   <script>
-    fetch('/api/user').then(r => { if (r.ok) location.href = 'dashboard.html'; });
-    document.getElementById('loginForm').onsubmit = async function(e) {
+    document.getElementById('registerForm').onsubmit = async function(e) {
       e.preventDefault();
+      const name = document.getElementById('name').value;
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       const error = document.getElementById('error');
       error.textContent = '';
-      const res = await fetch('/api/login', {
+      const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ name, email, password })
       });
       const data = await res.json();
       if (data.success) {
         window.location.href = 'dashboard.html';
       } else {
-        error.textContent = data.error || 'Login failed';
+        error.textContent = data.error || 'Registration failed';
       }
     };
   </script>
