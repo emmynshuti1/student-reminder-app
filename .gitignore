@@ -1,4 +1,7 @@
 node_modules/
 database.sqlite
+database.sqlite-wal
+database.sqlite-shm
+database.sqlite.backup-*
 *.log
 .DS_Store
